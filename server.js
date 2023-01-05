@@ -3,6 +3,9 @@ const app = express();
 
 app.use(express.json());
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+
 const songs = [
   {
     id: 1,
@@ -11,9 +14,15 @@ const songs = [
   },
 ];
 
+app.use(express.static('build'));
+
+app.get('/', (req, res) => {
+  // serve my react app
+});
+
 app.get('/api/songs', (req, res) => {
   console.log('GET /api/songs');
-  res.send({ songs: songs });
+  res.send(songs);
 });
 
 app.post('/api/songs', (req, res) => {
@@ -21,12 +30,11 @@ app.post('/api/songs', (req, res) => {
   console.log('POST /api/songs', data);
   data.id = songs.length + 1;
   songs.push(data);
-  res.send(data);
+  res.redirect('/');
 });
 
-app.get('/', (req, res) => {
-  console.log('GET /');
-  res.send('<h1>hello aws</h1>');
+app.get('*', (req, res) => {
+  res.sendFile('build/index.html');
 });
 
 const port = process.env.PORT || 8080;
